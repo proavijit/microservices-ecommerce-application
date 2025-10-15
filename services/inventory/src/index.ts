@@ -3,6 +3,10 @@ import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import morgan from 'morgan';
+import { createInventory, getInventoryById, getInventoryDetails, updateInventory } from './controllers/index.ts';
+
+
+
 
 dotenv.config();
 
@@ -17,6 +21,13 @@ app.use(express.json());
 app.get('/health', (req: Request, res: Response) => {
     res.status(200).json({ status: 'UP' });
 });
+
+
+// Inventory routes
+app.get('/inventories/:id/details', getInventoryDetails);
+app.get('/inventories/:id', getInventoryById);
+app.put('/inventories/:id', updateInventory);
+app.post('/inventories', createInventory);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
