@@ -3,7 +3,12 @@ import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import morgan from 'morgan';
-
+import {
+	createProduct,
+	getProductDetails,
+	getProducts,
+	updateProduct,
+} from './controllers';
 
 
 
@@ -21,7 +26,11 @@ app.get('/health', (req: Request, res: Response) => {
     res.status(200).json({ status: 'UP' });
 });
 
-
+// routes
+app.get('/products/:id', getProductDetails);
+app.put('/products/:id', updateProduct);
+app.get('/products', getProducts);
+app.post('/products', createProduct);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
