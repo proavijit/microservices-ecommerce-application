@@ -20,35 +20,31 @@ export const createHandler = (
 				method,
 				url,
 				data: req.body,
-				timeout: 10000, // 10 second timeout
 				headers: {
-					origin: `http://localhost:${process.env.PORT || 8081}`,
+					origin: 'http://localhost:8081',
 					'x-user-id': req.headers['x-user-id'] || '',
 					'x-user-email': req.headers['x-user-email'] || '',
 					'x-user-name': req.headers['x-user-name'] || '',
 					'x-user-role': req.headers['x-user-role'] || '',
 					'user-agent': req.headers['user-agent'],
-					'content-type': 'application/json',
 				},
 			});
 
 			res.json(data);
 		} catch (error) {
-			console.error('API Gateway Error:', error);
+			console.log(error);
 			if (error instanceof axios.AxiosError) {
-				const status = error.response?.status || 500;
-				const data = error.response?.data || { message: 'Service Error' };
-				console.error(`Service error: ${status}`, data);
-				return res.status(status).json(data);
+				return res
+					.status(error.response?.status || 500)
+					.json(error.response?.data);
 			}
-			console.error('Unknown error:', error);
 			return res.status(500).json({ message: 'Internal Server Error' });
 		}
 	};
 };
 
 export const getMiddlewares = (names: string[]) => {
-	return names.map((name) => middlewares[name]).filter(Boolean);
+	return names.map((name) => middlewares[name]);
 };
 
 export const configureRoutes = (app: Express) => {
@@ -59,7 +55,7 @@ export const configureRoutes = (app: Express) => {
 				const endpoint = `/api${route.path}`;
 				const middleware = getMiddlewares(route.middlewares);
 				const handler = createHandler(hostname, route.path, method);
-				app[method](endpoint, ...middleware, handler);
+				app[method](endpoint, middleware, handler);
 			});
 		});
 	});

@@ -6,21 +6,21 @@
         {
           "path": "/products",
           "methods": [
-            "get",
-            "post"
+            "get"
           ],
           "middlewares": []
+        },
+        {
+          "path": "/products",
+          "methods": [
+            "post"
+          ],
+          "middlewares": [
+            "auth"
+          ]
         },
         {
           "path": "/products/:id",
-          "methods": [
-            "get",
-            "put"
-          ],
-          "middlewares": []
-        },
-        {
-          "path": "/health",
           "methods": [
             "get"
           ],
@@ -29,36 +29,72 @@
       ]
     },
     "inventory": {
-      "url": "http://localhost:8002",
+      "url": "http://localhost:4002",
       "routes": [
-        {
-          "path": "/inventories",
-          "methods": [
-            "post"
-          ],
-          "middlewares": []
-        },
         {
           "path": "/inventories/:id",
           "methods": [
-            "get",
             "put"
           ],
-          "middlewares": []
+          "middlewares": [
+            "auth"
+          ]
         },
         {
           "path": "/inventories/:id/details",
           "methods": [
             "get"
           ],
+          "middlewares": [
+            "auth"
+          ]
+        }
+      ]
+    },
+    "auth": {
+      "url": "http://localhost:4003",
+      "routes": [
+        {
+          "path": "/auth/register",
+          "methods": [
+            "post"
+          ],
           "middlewares": []
         },
         {
-          "path": "/health",
+          "path": "/auth/login",
+          "methods": [
+            "post"
+          ],
+          "middlewares": []
+        },
+        {
+          "path": "/auth/verify-email",
+          "methods": [
+            "post"
+          ],
+          "middlewares": []
+        },
+        {
+          "path": "/auth/verify-token",
+          "methods": [
+            "post"
+          ],
+          "middlewares": []
+        }
+      ]
+    },
+    "user": {
+      "url": "http://localhost:4004",
+      "routes": [
+        {
+          "path": "/users/:id",
           "methods": [
             "get"
           ],
-          "middlewares": []
+          "middlewares": [
+            "auth"
+          ]
         }
       ]
     }

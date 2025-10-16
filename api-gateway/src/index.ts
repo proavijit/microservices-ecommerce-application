@@ -1,17 +1,14 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import morgan from 'morgan';
-import cors from 'cors';
 import { configureRoutes } from './utils';
+import getPort from 'get-port';
 
 dotenv.config();
 
 const app = express();
-
-// CORS middleware
-app.use(cors());
 
 // security middleware
 app.use(helmet());
@@ -48,12 +45,27 @@ app.use((_req, res) => {
 });
 
 // error handler
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+app.use((err, _req, res, _next) => {
 	console.error(err.stack);
 	res.status(500).json({ message: 'Internal Server Error' });
 });
 
-const PORT = process.env.PORT || 8082;
-app.listen(PORT, () => {
-	console.log(`API Gateway is running on port ${PORT}`);
+const envPort = process.env.PORT ? Number(process.env.PORT) : undefined;
+
+// Start server with dynamic port selection and graceful shutdown
+(async () => {
+	const port = envPort ?? (await getPort({ port: 8090 }));
+	const server = app.listen(port, () => {
+		console.log(`API Gateway is running on port ${port}`);
+	});
+
+	const shutdown = () => {
+		server.close(() => process.exit(0));
+	};
+
+	process.on('SIGINT', shutdown);
+	process.on('SIGTERM', shutdown);
+})().catch((err) => {
+	console.error(err);
+	process.exit(1);
 });
