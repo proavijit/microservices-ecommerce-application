@@ -16,6 +16,12 @@ export const InventoryCreateDTOSchema = z.object({
 })
 
 export const InventoryUpdateDTOSchema = z.object({
-	quantity: z.number().int(),
+	quantity: z.union([z.string().transform(val => parseInt(val)), z.number()]).pipe(z.number().int().positive()),
     actionType: z.enum(['IN', 'OUT']),
-});
+}).or(z.object({
+	quantity: z.union([z.string().transform(val => parseInt(val)), z.number()]).pipe(z.number().int().positive()),
+    ActionType: z.enum(['IN', 'OUT']).transform(val => val.toLowerCase().replace('type', '') + 'type'),
+})).transform(data => ({
+    quantity: data.quantity,
+    actionType: 'actionType' in data ? data.actionType : data.ActionType
+}));

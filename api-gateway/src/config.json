@@ -48,6 +48,15 @@
           "middlewares": [
             "auth"
           ]
+        },
+        {
+          "path": "/inventories/product/:productId",
+          "methods": [
+            "put"
+          ],
+          "middlewares": [
+            "auth"
+          ]
         }
       ]
     },

@@ -3,7 +3,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import morgan from 'morgan';
-import { createInventory, getInventoryById, getInventoryDetails, updateInventory } from './controllers/index.ts';
+import { createInventory, getInventoryById, getInventoryDetails, updateInventory, updateInventoryByProductId } from './controllers/index.ts';
 
 
 
@@ -27,6 +27,7 @@ app.get('/health', (req: Request, res: Response) => {
 app.get('/inventories/:id/details', getInventoryDetails);
 app.get('/inventories/:id', getInventoryById);
 app.put('/inventories/:id', updateInventory);
+app.put('/inventories/product/:productId', updateInventoryByProductId);
 app.post('/inventories', createInventory);
 
 // 404 handler
@@ -44,7 +45,7 @@ app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ message: 'Internal Server Error' });
 });
 
-const PORT = process.env.PORT || 8002;
+const PORT = process.env.PORT || 4002;
 const serviceName = process.env.SERVICE_NAME || 'Inventory Service';
 
 app.listen(PORT, () => {

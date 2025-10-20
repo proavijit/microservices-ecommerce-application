@@ -2,20 +2,20 @@ import { Request, Response, NextFunction } from 'express';
 import prisma from '../prisma';
 import { InventoryUpdateDTOSchema } from '../schemas';
 
-const updateInventory = async (
+const updateInventoryByProductId = async (
 	req: Request,
 	res: Response,
 	next: NextFunction
 ) => {
 	try {
-		// check if the inventory exists
-		const { id } = req.params;
+		// check if the inventory exists by productId
+		const { productId } = req.params;
 		const inventory = await prisma.inventory.findUnique({
-			where: { id },
+			where: { productId },
 		});
 
 		if (!inventory) {
-			return res.status(404).json({ message: 'Inventory not found' });
+			return res.status(404).json({ message: 'Inventory not found for this product' });
 		}
 
 		// update the inventory
@@ -31,7 +31,7 @@ const updateInventory = async (
 
 		// find the last history
 		const lastHistory = await prisma.history.findFirst({
-			where: { inventoryId: id },
+			where: { inventoryId: inventory.id },
 			orderBy: { createdAt: 'desc' },
 		});
 
@@ -47,7 +47,7 @@ const updateInventory = async (
 
 		// update the inventory
 		const updatedInventory = await prisma.inventory.update({
-			where: { id },
+			where: { id: inventory.id },
 			data: {
 				quantity: newQuantity,
 				histories: {
@@ -61,14 +61,19 @@ const updateInventory = async (
 			},
 			select: {
 				id: true,
+				productId: true,
+				sku: true,
 				quantity: true,
 			},
 		});
 
-		return res.status(200).json(updatedInventory);
+		return res.status(200).json({
+			message: 'Inventory updated successfully',
+			data: updatedInventory
+		});
 	} catch (error) {
 		next(error);
 	}
 };
 
-export default updateInventory;
+export default updateInventoryByProductId;
